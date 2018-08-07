@@ -1,0 +1,7 @@
+ubuntu 16.04.4 LTS
+openstack ocata
+
+server pc 1 : i7 8700 , ram 16 , board h370 
+server pc 2 : i7 8700 , ram 16 , board h370 
+
+network - each static ip and local network with pc1 - pc2
