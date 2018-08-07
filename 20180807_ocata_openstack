@@ -10,3 +10,13 @@ network - each static ip and local network with pc1 - pc2
 
 ------------------------------------
 ### set ubuntu network
+````
+vi /etc/network/interfaces
+
+
+
+
+vi /etc/hosts
+192.168.56.101    controller
+192.168.56.102     compute
+````
