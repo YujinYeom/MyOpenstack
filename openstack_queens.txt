@@ -1,0 +1,105 @@
+## Install Openstack ver.Queens
+
+1. virtual box 
+ - 2 cpu ,  4g ram , 10gb storage  * 2
+ - network host - birdge (enable) / NAT
+ //same controller node and compute node 
+
+2. network interface
+ 
+// controller node
+ # vi /etc/interfaces
+  auto enp0s3
+  iface enp0s3 inet static
+   address 10.0.0.11
+   netmask 255.255.255.0
+   gateway 10.0.0.1
+   dns-nameserver 8.8.8.8
+
+  auto enp0s8
+  iface enp0s8 inet dhcp
+ 
+// compute node
+ # vi /etc/interfaces
+  auto enp0s3
+  iface enp0s3 inet static
+   address 10.0.0.31
+   netmask 255.255.255.0
+   gateway 10.0.0.1
+   dns-nameserver 8.8.8.8
+
+  auto enp0s8
+  iface enp0s8 inet dhcp
+
+// controller node & compute node
+ # vi /etc/hosts
+  #127.0.1.1	controller
+  10.0.0.11 	controller
+  10.0.0.31	compute1
+
+3. basic environment
+ //controller node 
+ # apt install chrony
+ # service chrony restart
+ # chronyc sources
+
+ // compute node
+ # apt install chrony
+ # vi /etc/chrony/chrony.conf
+ ...
+ server controller iburst
+ ...
+ # service chrony restart
+ # chronyc sources
+
+ //controller node & compute node
+ # apt install software-properties-common
+ # add-apt-repository cloud-archive:queens 
+ # apt update && apt dist-upgrade
+ # apt install python-openstackclient
+ 
+ //controller node
+ # apt install mariadb-server python-pymysql
+ # vi /etc/mysql/mariadb.conf.d/99-openstack.cnf
+
+ [mysqld]
+ bind-address = 10.0.0.11
+
+ default-storage-engine = innodb
+ innodb_file_per_table = on
+ max_connections = 4096
+ collation-server = utf8_general_ci
+ character-set-server = utf8
+
+ # service mysql restart
+ # mysql_secure_installation
+ # vi /etc/root/mysql
+ openstack
+ 
+ # apt install rabbitmq-server
+ # rabbitmqctl add_user openstack openstack
+ # rabbitmqctl set_permissions openstack ".*" ".*" ".*"
+
+ # apt install memcached python-memcache 
+ # vi /etc/memcached.conf
+ -l 10.0.0.11 //change 127.0.0.1
+ # service memcached restart
+ 
+ # apt install etcd
+ # vi /etc/default/etcd
+ ETCD_NAME="controller"
+ ETCD_DATA_DIR="/var/lib/etcd"
+ ETCD_INITIAL_CLUSTER_STATE="new"
+ ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster-01"
+ ETCD_INITIAL_CLUSTER="controller=http://10.0.0.11:2380"
+ ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.0.0.11:2380"
+ ETCD_ADVERTISE_CLIENT_URLS="http://10.0.0.11:2379"
+ ETCD_LISTEN_PEER_URLS="http://0.0.0.0:2380"
+ ETCD_LISTEN_CLIENT_URLS="http://10.0.0.11:2379"
+  
+ # systemctl enable etcd
+ # systemctl start etcd
+
+
+
+
